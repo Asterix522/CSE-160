@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Vector Operations</title>
+<style>
+    canvas {
+        border: 1px solid #000;
+        margin-bottom: 20px;
+        background-color: #000;
+    }
+    
+    .vector-inputs {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+    
+    .coord-input {
+        margin-bottom: 5px;
+    }
+    
+    input[type="text"] {
+        width: 80px;
+    }
+    
+    .operation-row {
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+
+<body onload="main()">
+<h1>Vector Operations</h1>
+
+<canvas id="example" width="400" height="400">
+ Please use a browser that supports "canvas"
+</canvas>
+
+<div class="vector-inputs">
+    <div class="vector-input">
+        <h3>Vector 1</h3>
+        <div class="coord-input">
+            <label>X: <input type="text" id="xCoord1" value="3"></label>
+        </div>
+        <div class="coord-input">
+            <label>Y: <input type="text" id="yCoord1" value="4"></label>
+        </div>
+    </div>
+    
+    <div class="vector-input">
+        <h3>Vector 2</h3>
+        <div class="coord-input">
+            <label>X: <input type="text" id="xCoord2" value="1"></label>
+        </div>
+        <div class="coord-input">
+            <label>Y: <input type="text" id="yCoord2" value="2"></label>
+        </div>
+    </div>
+</div>
+
+<button id="drawButton">Draw Vectors</button>
+
+<div class="operation-controls">
+    <h3>Vector Operations</h3>
+    
+    <div class="operation-row">
+        <label for="operation">Operation:</label>
+        <select id="operation">
+            <option value="add">Add</option>
+            <option value="sub">Subtract</option>
+            <option value="mul">Multiply</option>
+            <option value="div">Divide</option>
+            <option value="angle">Angle Between</option>
+            <option value="area">Area</option>
+            <option value="mag">Magnitude</option>
+            <option value="norm">Normalize</option>
+        </select>
+    </div>
+    
+    <div class="operation-row">
+        <label for="scalar">Scalar value:</label>
+        <input type="text" id="scalar" value="2">
+    </div>
+    
+    <button id="drawOperationButton">Calculate Operation</button>
+    
+</div>
+
+<script src="../lib/cuon-matrix-cse160.js"></script>
+<script src="asg0.js"></script>
+</body>
+</html>
