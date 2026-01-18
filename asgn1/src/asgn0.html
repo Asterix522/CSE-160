@@ -5,11 +5,26 @@
     <title>WebGL Drawing App</title>
     <style>
         body { margin: 0; padding: 20px; }
-        canvas { border: 1px solid black; display: block; margin-bottom: 20px; }
-        
+        canvas { 
+            border: 1px solid black; 
+            display: block; 
+            margin-bottom: 20px; 
+            cursor: none; /* Hide cursor when over canvas */
+        }
+        #bunnyCanvas {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            z-index: 1;
+        }
     </style>
 </head>
 <body onload="main()">
+    <!-- Bunny overlay canvas (same position/size as WebGL canvas) -->
+    <canvas id="bunnyCanvas" width="400" height="400"></canvas>
+    
+    <!-- WebGL Canvas -->
     <canvas id="webgl" width="400" height="400">
         Please use a browser that supports canvas.
     </canvas>
@@ -43,5 +58,139 @@
     </div>
 
     <script src="asgn0.js"></script>
+    <script>
+        // Bunny animation variables
+        var bunnySprite = null;
+        var currentFrame = 0;
+        var totalFrames = 5;
+        var frameWidth = 32;
+        var frameHeight = 32;
+        var animationInterval = null;
+        var animSpeed = 150; // milliseconds per frame
+        var bunnyScale = 2; // Scale factor for bunny
+        var mouseX = 200; // Center of canvas
+        var mouseY = 200;
+        var mouseOnCanvas = false;
+        var bunnyCanvas, bunnyCtx;
+        
+        // Load bunny sprite sheet automatically
+        window.addEventListener('load', function() {
+            loadBunnySprite();
+            setupBunnyCanvas();
+            startBunnyAnimation();
+        });
+        
+        function loadBunnySprite() {
+            var img = new Image();
+            img.onload = function() {
+                bunnySprite = img;
+                console.log('Bunny sprite sheet loaded');
+            };
+            
+            img.onerror = function() {
+                console.error('Failed to load BunnyRun-Sheet.png');
+                // Create a simple placeholder
+                createPlaceholderBunny();
+            };
+            
+            img.src = '../lib/BunnyRun-Sheet.png';
+        }
+        
+        function createPlaceholderBunny() {
+            var canvas = document.createElement('canvas');
+            canvas.width = 160;
+            canvas.height = 32;
+            var ctx = canvas.getContext('2d');
+            
+            for (var i = 0; i < 5; i++) {
+                // Bunny body
+                ctx.fillStyle = 'lightgray';
+                ctx.fillRect(i * 32, 0, 32, 32);
+                
+                // Head
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(i * 32 + 16, 12, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Ears
+                ctx.fillRect(i * 32 + 14, 4, 3, 8);
+                ctx.fillRect(i * 32 + 19, 4, 3, 8);
+                
+                // Body
+                ctx.beginPath();
+                ctx.ellipse(i * 32 + 16, 24, 10, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            bunnySprite = canvas;
+        }
+        
+        function setupBunnyCanvas() {
+            bunnyCanvas = document.getElementById('bunnyCanvas');
+            bunnyCtx = bunnyCanvas.getContext('2d');
+            
+            var webglCanvas = document.getElementById('webgl');
+            
+            // Track mouse only when over the canvas
+            webglCanvas.addEventListener('mousemove', function(event) {
+                var rect = webglCanvas.getBoundingClientRect();
+                mouseX = event.clientX - rect.left;
+                mouseY = event.clientY - rect.top;
+                mouseOnCanvas = true;
+                drawBunny();
+            });
+            
+            webglCanvas.addEventListener('mouseleave', function() {
+                mouseOnCanvas = false;
+                // Clear bunny when mouse leaves canvas
+                bunnyCtx.clearRect(0, 0, bunnyCanvas.width, bunnyCanvas.height);
+            });
+            
+            webglCanvas.addEventListener('mouseenter', function(event) {
+                mouseOnCanvas = true;
+                var rect = webglCanvas.getBoundingClientRect();
+                mouseX = event.clientX - rect.left;
+                mouseY = event.clientY - rect.top;
+                drawBunny();
+            });
+        }
+        
+        function startBunnyAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+            }
+            
+            animationInterval = setInterval(function() {
+                // Update frame
+                currentFrame = (currentFrame + 1) % totalFrames;
+                
+                // Only draw if mouse is on canvas
+                if (mouseOnCanvas && bunnySprite) {
+                    drawBunny();
+                }
+            }, animSpeed);
+        }
+        
+        function drawBunny() {
+            if (!bunnyCanvas || !bunnyCtx || !bunnySprite || !mouseOnCanvas) return;
+            
+            // Clear previous frame
+            bunnyCtx.clearRect(0, 0, bunnyCanvas.width, bunnyCanvas.height);
+            
+            var scaledWidth = frameWidth * bunnyScale;
+            var scaledHeight = frameHeight * bunnyScale;
+            
+            // Draw current frame centered on mouse
+            var drawX = mouseX - scaledWidth / 2;
+            var drawY = mouseY - scaledHeight / 2;
+            
+            bunnyCtx.drawImage(
+                bunnySprite,
+                currentFrame * frameWidth, 0, frameWidth, frameHeight,
+                drawX, drawY, scaledWidth, scaledHeight
+            );
+        }
+    </script>
 </body>
 </html>

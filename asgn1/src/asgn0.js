@@ -271,7 +271,7 @@ function drawShape(shape) {
     gl.deleteBuffer(vertexBuffer);
 }
 
-function drawRabbit() {
+function drawRabbit() { //wayy too long to be this fugly
     //Switch to triangle mode
     setShape('triangle');
     
@@ -503,7 +503,6 @@ function drawRabbit() {
     ];
     shapes.push({type: 'triangle', vertices: letter_RC, color: color.slice()});
     
-
 
     color = originalColor;
     renderAllShapes();
