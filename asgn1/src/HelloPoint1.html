@@ -5,12 +5,13 @@
     <title>WebGL Drawing App</title>
     <style>
         body { margin: 0; padding: 20px; }
-        canvas { border: 1px solid black; }
+        canvas { border: 1px solid black; display: block; margin-bottom: 20px; }
+        
     </style>
 </head>
 <body onload="main()">
     <canvas id="webgl" width="400" height="400">
-        Please use a browser that supports WebGL.
+        Please use a browser that supports canvas.
     </canvas>
     
     <div>
@@ -18,6 +19,7 @@
         <button onclick="setShape('circle')">Circles</button>
         <button onclick="setShape('triangle')">Triangles</button>
         <button onclick="clearCanvas()">Clear</button>
+        <button onclick="drawRabbit()">Draw Rabbit</button>
     </div>
     
     <div>
@@ -34,6 +36,10 @@
         R: <input type="range" id="red" min="0" max="255" value="255" oninput="color[0] = this.value/255">
         G: <input type="range" id="green" min="0" max="255" value="0" oninput="color[1] = this.value/255">
         B: <input type="range" id="blue" min="0" max="255" value="0" oninput="color[2] = this.value/255">
+    </div>
+
+    <div class="image-container">
+        <img src="../lib/rabbitart.png" alt="Rabbit Art">
     </div>
 
     <script src="HelloPoint1.js"></script>
