@@ -125,7 +125,7 @@ function setupEventListeners() {
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseup', handleMouseUp);
     
-    //Update slider displays
+    //sliders
     document.getElementById('segments').addEventListener('input', function(e) {
         document.getElementById('segmentsValue').textContent = e.target.value;
     });
@@ -190,7 +190,7 @@ function clearCanvas() {
 
 function addShape(x, y) {
     var vertices;
-    var size = brushSize / 200; //Scale size for WebGL coordinates
+    var size = brushSize / 200; //scale
     
     switch(currentShape) {
         case 'point':
