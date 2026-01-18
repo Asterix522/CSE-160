@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 <head>
     <meta charset="utf-8" />
     <title>WebGL Drawing App</title>
@@ -21,6 +22,8 @@
     </style>
 </head>
 <body onload="main()">
+    
+   
     <!-- Bunny overlay canvas (same position/size as WebGL canvas) -->
     <canvas id="bunnyCanvas" width="400" height="400"></canvas>
     
@@ -29,6 +32,12 @@
         Please use a browser that supports canvas.
     </canvas>
     
+     <div>
+       Athea Reynolds<br>
+       atdreyno@ucsc.edu<br>
+       I used a sprite sheet to animate the mouse cursor as a bunny.<br>
+    </div>
+
     <div>
         <button onclick="setShape('point')">Squares</button>
         <button onclick="setShape('circle')">Circles</button>
@@ -54,7 +63,7 @@
     </div>
 
     <div class="image-container">
-        <img src="../lib/rabbitart.png" alt="Rabbit Art">
+        <img src="../lib/rabbitart.jpeg" alt="Rabbit Art">
     </div>
 
     <script src="asgn0.js"></script>
