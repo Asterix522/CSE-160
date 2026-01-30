@@ -26,51 +26,35 @@ var FSHADER_SOURCE = `
   }
 `
 
-// Global variables
+//variables
 let canvas;
 let gl;
 let a_Position;
 let u_FragColor;
-let u_Size;
 let u_ModelMatrix;
 let u_GlobalRotateMatrix;
-
-let MousePos = [0,0];
-
-
-// UI gloabl variables
-let selectedColor = [1.0, 1.0, 1.0, 1.0];
-let selectedSize = 5;
-let segments = 10;
 let angleX = 225;
 let angleY = 0;
-
 let globalRotateX = 0;
 let globalRotateY = 0;
-
+let giveCheese = false;
 let animation = true;
 
-//animation variables
+
 let rightHaunch = 0;
 let leftHaunch = 0;
-
 let backFeet = 0;
 let tailJoint = 0;
-
 let rightArm = 0;
 let rightPaw = 0;
-
 let leftArm = 0;
 let leftPaw = 0;
-
-
 let bodyJoint = 0;
-
 let headJoint = 0;
 let earJoint = 0;
 let noseJoint = 0;
-
 let blink = 0;
+
 
 function UI_Stuff(){
   document.getElementById("angleSlide").addEventListener("input", function(){globalRotateX = this.value;});
@@ -88,7 +72,8 @@ function UI_Stuff(){
   document.getElementById("noseJoint").addEventListener("mousemove", function(){noseJoint = this.value;});
   document.getElementById("earJoint").addEventListener("mousemove", function(){earJoint = this.value;});
   document.getElementById("animationOn").addEventListener("click", function(){animation = true;});
-  document.getElementById("animationOff").addEventListener("click", function(){animation = false;}); 
+  document.getElementById("animationOff").addEventListener("click", function(){animation = false;});
+  document.getElementById("giveCheese").addEventListener("click", function(){giveCheese = !giveCheese;});
 }
 
 function connectVariablesToGLSL() {
@@ -129,6 +114,7 @@ function connectVariablesToGLSL() {
 }
 
 function main() {
+  
 	canvas = document.getElementById("webgl");
     gl = getWebGLContext(canvas, false)
 	if (!gl) {
@@ -161,7 +147,7 @@ function tick(){
 }
 
 function animate(){
-  if(animation){
+  if(animation && !giveCheese){
 
     rightHaunch = (Math.max(-10*Math.sin(seconds), 0));
     
@@ -182,6 +168,9 @@ function animate(){
 
     noseJoint = (5*Math.sin(seconds*8));
     earJoint = (-5*Math.sin(seconds*6));
+  }else if (animation && giveCheese){
+    //wip
+    rightHaunch = (Math.max(-10*Math.sin(seconds), 0));
   }
 }
 
