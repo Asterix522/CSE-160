@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>ASG 2</title>
+    <title>BLOCKY RAT - Assignment 2</title>
     <script src="lib/cuon-matrix-cse160.js"></script>
     <script src="lib/cuon-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
@@ -14,13 +14,13 @@
 
 <body onload="main()">
     <canvas id="webgl" width="400" height="400"></canvas>
-    
+    <p id="check">ms: - fps: -</p>
     <p>
-        <label>rotate around Y axis: </label>
+        <label>Spin: </label>
         <input type="range" min="-360" max="360" value="0" step="1" id="angleSlide" />
     </p>
     <p>
-        <label>rotate around X axis: </label>
+        <label>Flip: </label>
         <input type="range" min="-360" max="360" value="0" step="1" id="angleSlide2" />
     </p>
     <p>
@@ -29,7 +29,7 @@
         <button id="animationOff">Off</button>
     </p>
      <p>
-        <label>Special Animation!</label>
+        <label>Poke!</label>
         <button id="giveCheese">On/Off</button>
     </p>
     <p>
@@ -45,8 +45,8 @@
         <input type="range" min="-20" max="20" value="0" step="1" id="leftHaunch" />
     </p>
     <p>
-        <label>tail joint: </label>
-        <input type="range" min="-50" max="50" value="0" step="1" id="tailJoint" />
+        <label>tail: </label>
+        <input type="range" min="-50" max="50" value="0" step="1" id="tailJ" />
     </p>
     <p>
         <label>right arm: </label>
@@ -65,20 +65,12 @@
         <input type="range" min="-90" max="90" value="0" step="1" id="leftPaw" />
     </p>
     <p>
-        <label>body joint: </label>
-        <input type="range" min="-20" max="20" value="0" step="1" id="bodyJoint" />
+        <label>body: </label>
+        <input type="range" min="-20" max="20" value="0" step="1" id="bodyJ" />
     </p>
     <p>
-        <label>head joint: </label>
-        <input type="range" min="-45" max="45" value="0" step="1" id="HeadJoint" />
-    </p>
-    <p>
-        <label>nose joint: </label>
-        <input type="range" min="-20" max="20" value="0" step="1" id="noseJoint" />
-    </p>
-    <p>
-        <label>ears joint: </label>
-        <input type="range" min="-20" max="20" value="0" step="1" id="earJoint" />
+        <label>head: </label>
+        <input type="range" min="-45" max="45" value="0" step="1" id="HeadJ" />
     </p>
 </body>
 </html>

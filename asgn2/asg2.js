@@ -40,24 +40,23 @@ let globalRotateY = 0;
 let giveCheese = false;
 let animation = true;
 
-
+//limb variables
 let rightHaunch = 0;
 let leftHaunch = 0;
 let backFeet = 0;
-let tailJoint = 0;
+let tailJ = 0;
 let rightArm = 0;
 let rightPaw = 0;
 let leftArm = 0;
 let leftPaw = 0;
-let bodyJoint = 0;
-let headJoint = 0;
-let earJoint = 0;
-let noseJoint = 0;
+let bodyJ = 0;
+let headJ = 0;
+let earJ = 0;
+let noseJ = 0;
 let blink = 0;
-let specialTailJoint = 0;
+let specialTailJ = 0;
 let accumulatedTailRotation = 0;
 let speedFactor = 0;
-
 
 
 function UI_Stuff(){
@@ -66,18 +65,17 @@ function UI_Stuff(){
   document.getElementById("rightHaunch").addEventListener("mousemove", function(){rightHaunch = this.value;});
   document.getElementById("backFeet").addEventListener("mousemove", function(){backFeet = this.value;});
   document.getElementById("leftHaunch").addEventListener("mousemove", function(){leftHaunch = this.value;});
-  document.getElementById("tailJoint").addEventListener("mousemove", function(){tailJoint = this.value;});
+  document.getElementById("tailJ").addEventListener("mousemove", function(){tailJ = this.value;});
   document.getElementById("rightArm").addEventListener("mousemove", function(){rightArm = this.value;});
   document.getElementById("rightPaw").addEventListener("mousemove", function(){rightPaw = this.value;});
   document.getElementById("leftArm").addEventListener("mousemove", function(){leftArm = this.value;});
   document.getElementById("leftPaw").addEventListener("mousemove", function(){leftPaw = this.value;});
-  document.getElementById("bodyJoint").addEventListener("mousemove", function(){bodyJoint = this.value;});
-  document.getElementById("HeadJoint").addEventListener("mousemove", function(){headJoint = this.value;});
-  document.getElementById("noseJoint").addEventListener("mousemove", function(){noseJoint = this.value;});
-  document.getElementById("earJoint").addEventListener("mousemove", function(){earJoint = this.value;});
+  document.getElementById("bodyJ").addEventListener("mousemove", function(){bodyJ = this.value;});
+  document.getElementById("HeadJ").addEventListener("mousemove", function(){headJ = this.value;});
   document.getElementById("animationOn").addEventListener("click", function(){animation = true;});
   document.getElementById("animationOff").addEventListener("click", function(){animation = false;});
   document.getElementById("giveCheese").addEventListener("click", function(){giveCheese = !giveCheese;});
+  document.addEventListener("click", function(event) {if (event.shiftKey) {giveCheese = !giveCheese;}});
 }
 
 function connectVariablesToGLSL() {
@@ -117,6 +115,8 @@ function connectVariablesToGLSL() {
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
 }
 
+
+
 function main() {
   
 	canvas = document.getElementById("webgl");
@@ -133,18 +133,22 @@ function main() {
     canvas.onmousemove = function(ev) { 
     if (ev.buttons == 1) { 
     angleX += ev.movementX;
-    angleY += ev.movementY; } };
+    angleY += ev.movementY; } 
+
+  };
+
+   
 
     //canvas color
     gl.clearColor(0.0, 1.0, 0.0, 1.0);
     requestAnimationFrame(tick);
 }
 
-var startTime = performance.now()/1000;
-var seconds = performance.now()/1000 - startTime;
+var clock = performance.now()/1000;
+var seconds = performance.now()/1000 - clock;
 
 function tick(){
-    seconds = performance.now()/1000 - startTime;
+    seconds = performance.now()/1000 - clock;
     animate();
     renderAllShapes();
     requestAnimationFrame(tick);
@@ -160,7 +164,7 @@ function animate(){
     backFeet = (Math.min(-20*Math.sin(seconds), 40));
 
     blink = 0.1 * (0.5 + 0.5 * Math.sin(seconds));
-    tailJoint = (Math.min(-30*Math.sin(seconds), 40));
+    tailJ = (Math.min(-30*Math.sin(seconds), 40));
 
     rightArm = (Math.max(40* -Math.sin(seconds), 0));
     rightPaw = (Math.max(90* -Math.sin(seconds), -40));
@@ -168,16 +172,16 @@ function animate(){
     leftArm = (Math.max(40* -Math.sin(seconds), 0));
     leftPaw = (Math.max(90* -Math.sin(seconds), -40));
 
-    headJoint = (Math.max(30*Math.sin(seconds), 0));
-    bodyJoint = (Math.min(-15*Math.sin(seconds), 0));
+    headJ = (Math.max(30*Math.sin(seconds), 0));
+    bodyJ = (Math.min(-15*Math.sin(seconds), 0));
 
-    noseJoint = (5*Math.sin(seconds*8));
-    earJoint = (-5*Math.sin(seconds*6));
+    noseJ = (5*Math.sin(seconds*8));
+    earJ = (-5*Math.sin(seconds*6));
+
   }else if (animation && giveCheese){
-    //wip
-    headJoint = (Math.max(30*Math.sin(seconds), 0));
-    bodyJoint = (90+ Math.min(-40*Math.sin(seconds)));
-    earJoint = -(40*Math.sin(seconds));
+    headJ = (Math.max(30*Math.sin(seconds), 0));
+    bodyJ = (90+ Math.min(-40*Math.sin(seconds)));
+    earJ = -(40*Math.sin(seconds));
     
     blink = 0.1 * (0.5 + 0.5 * Math.sin(seconds));
     if (blink > 0.085) {
@@ -196,15 +200,15 @@ function animate(){
       leftPaw = -45 * Math.sin(4 * seconds) - 65;   
     }
 
-    let tailBodyJoint = 90 + Math.min(-30 * Math.sin(seconds + 1));
-    let t = (tailBodyJoint - 60) / 60;
+    let tailBodyJ = 90 + Math.min(-30 * Math.sin(seconds + 1));
+    let t = (tailBodyJ - 60) / 60;
     let widened = 1 / (1 + Math.exp(-8 * (t - 0.7)));
     let currentSpeed = 50 + 2000 * widened;
     accumulatedTailRotation += currentSpeed * (1/60);
-    specialTailJoint = accumulatedTailRotation % 360;
+    specialTailJ = accumulatedTailRotation % 360;
 
-    tailBodyJoint = 50 + 30 * Math.sin(seconds);  
-    t = (tailBodyJoint - 50) / 30;               
+    tailBodyJ = 50 + 30 * Math.sin(seconds);  
+    t = (tailBodyJ - 50) / 30;               
     widened = 1 / (1 + Math.exp(-8 * (t - 0.2))); 
     currentSpeed = 2 + 30 * widened;            
     speedFactor += currentSpeed * (1/60);
@@ -216,13 +220,16 @@ function animate(){
 }
 
 function renderAllShapes(){
+
+  var perm = performance.now();
+
   var ren = new Matrix4().rotate(angleX, 0, 1, 0).rotate(angleY, 1, 0, 0);
   if(!giveCheese){
     ren.translate(-.25, 0.25, 0);
   }
   if(giveCheese){
     ren.translate(0, 0, 0);
-    ren.translate(0, -.7 + bodyJoint*0.005, 0);
+    ren.translate(0, -.7 + bodyJ*0.005, 0);
     //angleX += 1;
   }
   ren.scale(0.6, 0.6, 0.6);
@@ -231,6 +238,19 @@ function renderAllShapes(){
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, ren.elements);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   makeRat();
+  
+  var d = performance.now() - perm;
+  sendTextToHTML("ms: " + d.toFixed(2) + " fps: " + Math.floor(10000/d), "check");
+
+}
+
+function sendTextToHTML(text, id){
+  var htmlElm = document.getElementById(id);
+  if(!htmlElm){
+    console.log("flop " + id);
+    return;
+  }
+  htmlElm.innerHTML = text;
 }
 
 function makeRat(){
@@ -238,7 +258,7 @@ function makeRat(){
         let body = new Cube();
         body.color = [140, 135, 122, 1];
         body.matrix.setTranslate(0, 0, 0.0);
-        body.matrix.rotate(bodyJoint, 0, 0, 1);
+        body.matrix.rotate(bodyJ, 0, 0, 1);
         placeholder_body = new Matrix4(body.matrix);
         body.matrix.rotate(10, 0, 0, 1);
         body.matrix.scale(.5, -1, 0.5);
@@ -250,10 +270,10 @@ function makeRat(){
         head.matrix = new Matrix4(placeholder_body);
         head.matrix.translate(-.2, 0, 0);
         if(!giveCheese){
-        head.matrix.rotate(headJoint, headJoint, 0, 1);
+        head.matrix.rotate(headJ, headJ, 0, 1);
         }
         if(giveCheese){
-          head.matrix.rotate(-90 + headJoint*.7, 0, 0, 1);
+          head.matrix.rotate(-90 + headJ*.7, 0, 0, 1);
           head.matrix.translate(-.4, .4, 0);
         }
         placeholder_head = new Matrix4(head.matrix);
@@ -274,7 +294,7 @@ function makeRat(){
         nose.color = [0, 0, 0, 1];
         nose.matrix = new Matrix4(placeholder_head);
         nose.matrix.translate(-.24, .01, .22);
-        nose.matrix.rotate(noseJoint, 0, 0, 1);
+        nose.matrix.rotate(noseJ, 0, 0, 1);
         nose.matrix.scale(.05, .05, .05);
         nose.render();
 
@@ -285,7 +305,7 @@ function makeRat(){
         ear2.color = [140, 135, 122, 1];
         ear2.matrix = new Matrix4(placeholder_head);
         ear2.matrix.translate(.25, .3, -.15);
-        ear2.matrix.rotate(earJoint, 0, 0, 1);
+        ear2.matrix.rotate(earJ, 0, 0, 1);
         tempEarMatrix2 = new Matrix4(ear2.matrix);
         ear2.matrix.scale(.05, .35, 0.35);
         ear2.render();
@@ -301,7 +321,7 @@ function makeRat(){
         ear1.color = [140, 135, 122, 1];
         ear1.matrix = new Matrix4(placeholder_head);
         ear1.matrix.translate(.25, .3, .3);
-        ear1.matrix.rotate(earJoint, 0, 0, 1);
+        ear1.matrix.rotate(earJ, 0, 0, 1);
         tempEarMatrix = new Matrix4(ear1.matrix);
         ear1.matrix.scale(.05, .35, .35);
         ear1.render();
@@ -456,7 +476,7 @@ function makeRat(){
         tail.matrix = new Matrix4(placeholder_body);
         tail.matrix.translate(.6, -.8, .2);
         if(!giveCheese){
-          tail.matrix.rotate(tailJoint-50, 0, 0, 1);
+          tail.matrix.rotate(tailJ-50, 0, 0, 1);
         }
         if(giveCheese){
           tail.matrix.rotate(-90, 0, 0, 1);
@@ -469,11 +489,11 @@ function makeRat(){
         tail.matrix = temptailMatrix
         tail.matrix.translate(0, .4, 0);
         if (!giveCheese){
-          tail.matrix.rotate(-tailJoint, -tailJoint - 30, 0, 1);
+          tail.matrix.rotate(-tailJ, -tailJ - 30, 0, 1);
         }
         if (giveCheese){
           tail.matrix.rotate(-90, 0, 0, 1);
-          tail.matrix.rotate(specialTailJoint, specialTailJoint, 0, 1);
+          tail.matrix.rotate(specialTailJ, specialTailJ, 0, 1);
         }
         temptailMatrix = new Matrix4(tail.matrix);
         tail.matrix.scale(.1, .4, .1);
@@ -484,7 +504,7 @@ function makeRat(){
         tailTip.matrix = new Matrix4(temptailMatrix);
         tailTip.matrix.translate(0, .4, 0);
         if (!giveCheese){
-        tailTip.matrix.rotate(tailJoint + 20, tailJoint, 0, 1);
+        tailTip.matrix.rotate(tailJ + 20, tailJ, 0, 1);
         }
         if (giveCheese){
           tailTip.matrix.rotate(0, 0, 0, 1);
