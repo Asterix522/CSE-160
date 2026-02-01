@@ -55,7 +55,6 @@ let earJoint = 0;
 let noseJoint = 0;
 let blink = 0;
 let specialTailJoint = 0;
-
 let accumulatedTailRotation = 0;
 
 
@@ -164,8 +163,9 @@ function animate(){
 
     rightArm = (Math.max(40* -Math.sin(seconds), 0));
     rightPaw = (Math.max(90* -Math.sin(seconds), -40));
+
     leftArm = (Math.max(40* -Math.sin(seconds), 0));
-    leftPaw = (Math.max(90* -Math.sin(seconds), -40));
+    leftPaw = (Math.max(-90* -Math.sin(seconds), -40));
 
     headJoint = (Math.max(30*Math.sin(seconds), 0));
     bodyJoint = (Math.min(-15*Math.sin(seconds), 0));
@@ -174,12 +174,19 @@ function animate(){
     earJoint = (-5*Math.sin(seconds*6));
   }else if (animation && giveCheese){
     //wip
-    rightHaunch = (Math.max(-40*Math.sin(seconds), 0));
-    leftHaunch = (Math.max(-40*Math.sin(seconds), 0));
-    backFeet = (Math.min(-40*Math.sin(seconds), 40));
+    rightHaunch = (Math.max(-40*Math.sin(2* seconds), 0));
+    leftHaunch = (Math.max(-40*Math.sin(3*seconds), 0));
+    backFeet = (Math.min(-40*Math.sin(4*seconds), 40));
+
+    rightArm = 50 * Math.sin(3 * seconds) - 45;  
+    leftArm = 50 * Math.sin(3 * seconds) - 45;     
+    rightPaw = -45 * Math.sin(4 * seconds) - 65;  
+    leftPaw = -45 * Math.sin(4 * seconds) - 65;   
+
+    earJoint = -(40*Math.sin(seconds));
 
     headJoint = (Math.max(30*Math.sin(seconds), 0));
-    blink = 0.1 * (0.5 + 0.5 * Math.sin(seconds));
+    blink = 0.1
     bodyJoint = (90+ Math.min(-40*Math.sin(seconds)));
 
     let tailBodyJoint = 90 + Math.min(-30 * Math.sin(seconds + 1));
@@ -197,8 +204,8 @@ function renderAllShapes(){
     ren.translate(-.25, 0.25, 0);
   }
   if(giveCheese){
-    ren.translate(0, -0.25, 0);
-    //globalRotateX += 1;
+    ren.translate(0, -.7 + bodyJoint*0.005, 0);
+    angleX += 1;
   }
   ren.scale(0.6, 0.6, 0.6);
   ren.rotate(globalRotateX, 0, 1, 0);
@@ -254,6 +261,24 @@ function makeRat(){
         nose.render();
 
         //ears
+        
+
+        let ear2 = new Cube();
+        ear2.color = [140, 135, 122, 1];
+        ear2.matrix = new Matrix4(placeholder_head);
+        ear2.matrix.translate(.25, .3, -.15);
+        ear2.matrix.rotate(earJoint, 0, 0, 1);
+        tempEarMatrix2 = new Matrix4(ear2.matrix);
+        ear2.matrix.scale(.05, .35, 0.35);
+        ear2.render();
+        //inner ear
+        ear2.color = [255, 100, 100, 1];
+        ear2.matrix = tempEarMatrix2;
+        ear2.matrix.translate(-0.01, .03, .05);
+        ear2.matrix.scale(.025, .25, .25);
+        ear2.render();
+
+
         let ear1 = new Cube();
         ear1.color = [140, 135, 122, 1];
         ear1.matrix = new Matrix4(placeholder_head);
@@ -268,21 +293,6 @@ function makeRat(){
         ear1.matrix.translate(-.01, .03, .05);
         ear1.matrix.scale(.025, .25, .25);
         ear1.render();
-
-        let ear2 = new Cube();
-        ear2.color = [140, 135, 122, 1];
-        ear2.matrix = new Matrix4(placeholder_head);
-        ear2.matrix.translate(.25, .3, -.15);
-        ear2.matrix.rotate(earJoint, 0, 0, 1);
-        ear2.matrix.scale(.05, .35, 0.35);
-        ear2.render();
-        //inner ear
-        ear2.color = [255, 100, 100, 1];
-        ear2.matrix = new Matrix4(placeholder_head);
-        ear2.matrix.translate(.24, .33, -.1);
-        ear2.matrix.rotate(earJoint, 0, 0, 1);
-        ear2.matrix.scale(.025, .25, .25);
-        ear2.render();
         //end ears
       
         //eyes
@@ -361,7 +371,12 @@ function makeRat(){
         haunch.color = [140, 135, 122, 1];
         haunch.matrix = new Matrix4(placeholder_body);
         haunch.matrix.translate(.05,  -.15, .05);
+        if(!giveCheese){
         haunch.matrix.rotate(leftArm - 45, 0, 0, 1);
+        }
+        if(giveCheese){
+          haunch.matrix.rotate(leftArm + 135, 90, 0, 1);
+        }
         temphaunchMatrix = new Matrix4(haunch.matrix);
         haunch.matrix.scale(.15, -.3, -.1);
         haunch.render();
@@ -369,8 +384,14 @@ function makeRat(){
         foot.color = [140, 135, 122, 1];
         foot.matrix = temphaunchMatrix;
         foot.matrix.translate(0, -.2, 0);
+        if(!giveCheese){
         foot.matrix.rotate(leftPaw, -(2*leftPaw), leftPaw, 1);
         foot.matrix.rotate(-50, 0, 0, 1);
+        }
+        if(giveCheese){
+          foot.matrix.translate(0, -.1, 0);
+          foot.matrix.rotate(-leftPaw, 90, -leftPaw/2, 1);
+        }
         foot.matrix.scale(.15, -.3, -.1);
         foot.render();
 
@@ -378,7 +399,13 @@ function makeRat(){
         haunch.color = [140, 135, 122, 1];
         haunch.matrix = new Matrix4(placeholder_body);
         haunch.matrix.translate(0.05,  -.15, .55);
+        if(!giveCheese){
         haunch.matrix.rotate(rightArm - 45, 0, 0, 1);
+        }
+        if(giveCheese){
+          haunch.matrix.translate(0, 0, -0.1);
+          haunch.matrix.rotate(rightArm - 200, -90, 0, 1);
+        }
         temphaunchMatrix = new Matrix4(haunch.matrix);
         haunch.matrix.scale(.15, -.3, -.1);
         haunch.render();
@@ -387,8 +414,14 @@ function makeRat(){
         foot.color = [140, 135, 122, 1];
         foot.matrix = temphaunchMatrix;
         foot.matrix.translate(0, -.2, 0);
+        if(!giveCheese){
         foot.matrix.rotate(rightPaw, rightPaw * 2, -rightPaw, 1);
         foot.matrix.rotate(-50, 0, 0, 1);
+        }
+        if(giveCheese){
+          foot.matrix.translate(0, 0, -.05);
+          foot.matrix.rotate(-rightPaw, -90, rightPaw/2, 1);
+        }
         foot.matrix.scale(.15, -.3, -.1);
         foot.render();
         //end legs
