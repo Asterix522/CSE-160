@@ -56,6 +56,7 @@ let noseJoint = 0;
 let blink = 0;
 let specialTailJoint = 0;
 let accumulatedTailRotation = 0;
+let speedFactor = 0;
 
 
 
@@ -165,7 +166,7 @@ function animate(){
     rightPaw = (Math.max(90* -Math.sin(seconds), -40));
 
     leftArm = (Math.max(40* -Math.sin(seconds), 0));
-    leftPaw = (Math.max(-90* -Math.sin(seconds), -40));
+    leftPaw = (Math.max(90* -Math.sin(seconds), -40));
 
     headJoint = (Math.max(30*Math.sin(seconds), 0));
     bodyJoint = (Math.min(-15*Math.sin(seconds), 0));
@@ -174,27 +175,43 @@ function animate(){
     earJoint = (-5*Math.sin(seconds*6));
   }else if (animation && giveCheese){
     //wip
-    rightHaunch = (Math.max(-40*Math.sin(2* seconds), 0));
-    leftHaunch = (Math.max(-40*Math.sin(3*seconds), 0));
-    backFeet = (Math.min(-40*Math.sin(4*seconds), 40));
-
-    rightArm = 50 * Math.sin(3 * seconds) - 45;  
-    leftArm = 50 * Math.sin(3 * seconds) - 45;     
-    rightPaw = -45 * Math.sin(4 * seconds) - 65;  
-    leftPaw = -45 * Math.sin(4 * seconds) - 65;   
-
-    earJoint = -(40*Math.sin(seconds));
-
     headJoint = (Math.max(30*Math.sin(seconds), 0));
-    blink = 0.1
     bodyJoint = (90+ Math.min(-40*Math.sin(seconds)));
+    earJoint = -(40*Math.sin(seconds));
+    
+    blink = 0.1 * (0.5 + 0.5 * Math.sin(seconds));
+    if (blink > 0.085) {
+      blink = .05;
+      //rightHaunch = (Math.max(-40*Math.sin(16*seconds), 0));
+      //leftHaunch = (Math.max(-40*Math.sin(15*seconds), 0));
+      rightArm = 50 * Math.sin(16 * seconds) - 45;  
+      leftArm = 50 * Math.sin(16 * seconds) - 45;     
+      rightPaw = -45 * Math.sin(17 * seconds) - 65;  
+      leftPaw = -45 * Math.sin(17 * seconds) - 65;   
+    }else{
+      blink = .1 + 0.01 * -(0.05 + 0.5 * Math.sin(seconds * 3));
+      rightArm = 50 * Math.sin(3 * seconds) - 45;  
+      leftArm = 50 * Math.sin(3 * seconds) - 45;     
+      rightPaw = -45 * Math.sin(4 * seconds) - 65;  
+      leftPaw = -45 * Math.sin(4 * seconds) - 65;   
+    }
 
     let tailBodyJoint = 90 + Math.min(-30 * Math.sin(seconds + 1));
     let t = (tailBodyJoint - 60) / 60;
     let widened = 1 / (1 + Math.exp(-8 * (t - 0.7)));
-    let currentSpeed = 300 + 2000 * widened;
+    let currentSpeed = 50 + 2000 * widened;
     accumulatedTailRotation += currentSpeed * (1/60);
-    specialTailJoint = accumulatedTailRotation;
+    specialTailJoint = accumulatedTailRotation % 360;
+
+    tailBodyJoint = 50 + 30 * Math.sin(seconds);  
+    t = (tailBodyJoint - 50) / 30;               
+    widened = 1 / (1 + Math.exp(-8 * (t - 0.2))); 
+    currentSpeed = 2 + 30 * widened;            
+    speedFactor += currentSpeed * (1/60);
+    rightHaunch = 1 + 10 * Math.sin(speedFactor); 
+    leftHaunch = 1 + 10 * Math.sin(speedFactor + 3); 
+    backFeet = (Math.min(-40*Math.sin(seconds), 40));
+    
   }
 }
 
@@ -204,8 +221,9 @@ function renderAllShapes(){
     ren.translate(-.25, 0.25, 0);
   }
   if(giveCheese){
+    ren.translate(0, 0, 0);
     ren.translate(0, -.7 + bodyJoint*0.005, 0);
-    angleX += 1;
+    //angleX += 1;
   }
   ren.scale(0.6, 0.6, 0.6);
   ren.rotate(globalRotateX, 0, 1, 0);
@@ -300,7 +318,12 @@ function makeRat(){
         eye1.color = [0, 0, 0, 1];
         eye1.matrix = new Matrix4(placeholder_head);
         eye1.matrix.translate(-.05, .2, .05);
-        eye1.matrix.scale(.1, 0.01+blink, .1);
+        if(!giveCheese){
+          eye1.matrix.scale(.1, 0.01+blink, .1);
+        }
+        if(giveCheese){
+          eye1.matrix.scale(.1, blink, blink);
+        }
         eye1.render();
 
         let eye2 = new Cube();
@@ -313,7 +336,7 @@ function makeRat(){
           
         }
         if(giveCheese){
-          eye2.matrix.scale(.1, 0.01+blink, .1);
+          eye2.matrix.scale(.1, blink, blink);
         }
         eye2.render();
         //end eyes
