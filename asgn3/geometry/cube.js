@@ -57,7 +57,7 @@ class cube extends geometry{
 
     
     this.vertices = new Float32Array([
-        //RIGHT FACE (use sides texture)
+        //RIGHT FACE
         1.0, -1.0,  1.0, 1.0, 0.0, 0.0, sideUMax, sideVMaxFlipped,
         1.0, -1.0, -1.0, 1.0, 0.0, 0.0, sideUMin, sideVMaxFlipped,
         1.0,  1.0, -1.0, 1.0, 0.0, 0.0, sideUMin, sideVMinFlipped,
@@ -65,7 +65,7 @@ class cube extends geometry{
         1.0,  1.0, -1.0, 1.0, 0.0, 0.0, sideUMin, sideVMinFlipped,
         1.0,  1.0,  1.0, 1.0, 0.0, 0.0, sideUMax, sideVMinFlipped,
         
-        //LEFT FACE (use sides texture)
+        //LEFT FACE
         -1.0, -1.0, -1.0, 0.0, 1.0, 0.0, sideUMax, sideVMaxFlipped,
         -1.0, -1.0,  1.0, 0.0, 1.0, 0.0, sideUMin, sideVMaxFlipped,
         -1.0,  1.0,  1.0, 0.0, 1.0, 0.0, sideUMin, sideVMinFlipped,
@@ -73,7 +73,7 @@ class cube extends geometry{
         -1.0,  1.0,  1.0, 0.0, 1.0, 0.0, sideUMin, sideVMinFlipped,
         -1.0,  1.0, -1.0, 0.0, 1.0, 0.0, sideUMax, sideVMinFlipped,
         
-        //BACK FACE (use sides texture)
+        //BACK FACE
          1.0,  1.0, 1.0, 0.0, 0.0, 1.0, sideUMax, sideVMinFlipped,
         -1.0,  1.0, 1.0, 0.0, 0.0, 1.0, sideUMin, sideVMinFlipped,
         -1.0, -1.0, 1.0, 0.0, 0.0, 1.0, sideUMin, sideVMaxFlipped,
@@ -81,7 +81,7 @@ class cube extends geometry{
         -1.0, -1.0, 1.0, 0.0, 0.0, 1.0, sideUMin, sideVMaxFlipped,
          1.0, -1.0, 1.0, 0.0, 0.0, 1.0, sideUMax, sideVMaxFlipped,
          
-         //FRONT FACE (use sides texture)
+         //FRONT FACE
           1.0, -1.0, -1.0, 0.0, 1.0, 1.0, sideUMax, sideVMaxFlipped,
          -1.0, -1.0, -1.0, 0.0, 1.0, 1.0, sideUMin, sideVMaxFlipped,
          -1.0,  1.0, -1.0, 0.0, 1.0, 1.0, sideUMin, sideVMinFlipped,
@@ -89,7 +89,7 @@ class cube extends geometry{
          -1.0,  1.0, -1.0, 0.0, 1.0, 1.0, sideUMin, sideVMinFlipped,
           1.0,  1.0, -1.0, 0.0, 1.0, 1.0, sideUMax, sideVMinFlipped,
          
-         //TOP FACE (use top texture)
+         //TOP FACE
           1.0, 1.0, -1.0, 1.0, 1.0, 0.0, topUMax, topVMaxFlipped,
          -1.0, 1.0, -1.0, 1.0, 1.0, 0.0, topUMin, topVMaxFlipped,
          -1.0, 1.0,  1.0, 1.0, 1.0, 0.0, topUMin, topVMinFlipped,
@@ -97,7 +97,7 @@ class cube extends geometry{
           1.0, 1.0,  1.0, 1.0, 1.0, 0.0, topUMax, topVMinFlipped,
          -1.0, 1.0,  1.0, 1.0, 1.0, 0.0, topUMin, topVMinFlipped,
          
-         //BOTTOM FACE (use bottom texture)
+         //BOTTOM FACE
           1.0, -1.0, -1.0, 1.0, 0.0, 1.0, bottomUMax, bottomVMinFlipped,
          -1.0, -1.0, -1.0, 1.0, 0.0, 1.0, bottomUMin, bottomVMinFlipped,
          -1.0, -1.0,  1.0, 1.0, 0.0, 1.0, bottomUMin, bottomVMaxFlipped,

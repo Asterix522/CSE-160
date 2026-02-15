@@ -229,6 +229,13 @@ function destroyRat(ratIndex) {
 function respawnAllRats() {
     for (let i = 0; i < rats.length; i++) {
         if (rats[i] && ratDestroyed[i]) {
+            let pos = [
+                Math.random() * 10 - 5,
+                0,
+                Math.random() * 10 - 5
+            ];
+            rats[i].translate(0 + pos[0], 0, 0 +pos[2]);
+            rats[i].rotateY(Math.random() * 180);
             rats[i].addToScene(shapes);
         }
     }
