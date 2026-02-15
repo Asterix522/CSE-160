@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>ASG 3 - First Person Adventure</title>
+
+    <script src="asg3.js"></script>
+    <script src="camera.js"></script>
+    <script src="world.js"></script>
+    <script src="rat.js"></script>
+
+    <!-- Load geometry -->
+    <script src="geometry/geometry.js"></script>
+    <script src="geometry/triangle.js"></script>
+    <script src="geometry/cube.js"></script>
+    <script src="geometry/square.js"></script>
+    <script src="geometry/coloredcube.js"></script>
+    
+    <!-- Load external libraries -->
+    <script src="lib/cuon-matrix-cse160.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/webgl-utils.js"></script>
+    
+    <style>
+      /* Container to position canvas and overlays together */
+      .game-container {
+        position: relative;
+        display: inline-block;
+      }
+      
+      #crosshair {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px black;
+        pointer-events: none;
+        z-index: 1000;
+        font-family: 'Courier New', monospace;
+      }
+      
+      #message-area {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+        z-index: 1000;
+        font-family: 'Courier New', monospace;
+        font-size: 24px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px black;
+        color: #ffaa00;
+        animation: fadeInOut 2s ease-in-out;
+      }
+      
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-20px); }
+        15% { opacity: 1; transform: translateY(0); }
+        85% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); }
+      }
+      
+      /* Keep canvas at its original size */
+      #webgl {
+        display: block;
+        width: 800px;
+        height: 600px;
+        image-rendering: crisp-edges; /* Helps with pixel art style */
+      }
+      
+      /* Score display */
+      #score {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        color: white;
+        font-family: 'Courier New', monospace;
+        font-size: 18px;
+        text-shadow: 1px 1px 2px black;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+
+  <body onload="main()">
+    <div class="game-container">
+      <canvas id="webgl" width="800" height="600">
+        Please use a browser that supports "canvas"
+      </canvas>
+      <div id="crosshair">+</div>
+      <div id="message-area"></div>
+      <div id="score">Squish the rabbits! Play with sound.</div>
+    </div>
+    
+    <br>
+    <div style="font-family: monospace; padding: 10px;">
+      <strong>Controls:</strong><br>
+      W - Move forward<br>
+      A - Strafe left<br>
+      S - Move backward<br>
+      D - Strafe right<br>
+      Q - Look left<br>
+      E - Look right<br>
+      SPACE - Jump<br>
+      R - Respawn rats<br>
+      <br>
+    </div>
+  </body>
+</html>
