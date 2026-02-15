@@ -1,11 +1,11 @@
 class Camera {
     constructor(aspectRatio, near, far, world){
       this.fov = 60;
-      this.eye = new Vector3([0, 2, 6]); //Start position
+      this.eye = new Vector3([0, 2, 6]); //start position
       
       let initialDirX = 0;
       let initialDirY = 0;
-      let initialDirZ = -1; //Looking along negative Z axis
+      let initialDirZ = -1; //looking along negative Z axis
       
       this.center = new Vector3([
           this.eye.elements[0] + initialDirX,
@@ -17,7 +17,7 @@ class Camera {
 
       this.viewMatrix = new Matrix4();
       
-      //Calculate distance
+      //calculate distance
       this.distance = Math.sqrt(
         Math.pow(this.center.elements[0] - this.eye.elements[0], 2) +
         Math.pow(this.center.elements[1] - this.eye.elements[1], 2) +
@@ -25,22 +25,16 @@ class Camera {
     );
       this.yaw = Math.atan2(initialDirX, initialDirZ);
       this.pitch = Math.atan2(initialDirY, Math.sqrt(initialDirX*initialDirX + initialDirZ*initialDirZ));
-      
-      //Movement and rotation speed
       this.moveSpeed = 0.2;
       this.mouseSensitivity = 0.2;
       this.maxPitch = 80 * Math.PI / 180;
       this.minPitch = -80 * Math.PI / 180;
-      
-      //Physics
       this.velocityY = 0;
       this.gravity = 0.015;
       this.isGrounded = false;
       this.jumpStrength = 0.3;
       this.groundLevel = 2.0;
       this.playerHeight = 1.8;
-      
-      //Reference to world for collision detection
       this.world = world;
       
       this.updateView();
@@ -58,7 +52,6 @@ class Camera {
     }
 
     moveForward(){
-        //Move in the direction the camera is facing (but ignore pitch for movement)
         let moveX = Math.sin(this.yaw) * this.moveSpeed;
         let moveZ = Math.cos(this.yaw) * this.moveSpeed;
         
@@ -66,13 +59,11 @@ class Camera {
         let currentX = this.eye.elements[0];
         let currentZ = this.eye.elements[2];
         
-        //Try moving in X direction first
         let newX = currentX + moveX;
         if (!this.world.checkCollisionX(newX, currentZ, feetY)) {
             this.eye.elements[0] = newX;
         }
         
-        //Then try moving in Z direction
         let newZ = this.eye.elements[2] + moveZ;
         if (!this.world.checkCollisionZ(this.eye.elements[0], newZ, feetY)) {
             this.eye.elements[2] = newZ;
@@ -89,13 +80,11 @@ class Camera {
         let currentX = this.eye.elements[0];
         let currentZ = this.eye.elements[2];
         
-        //Try moving in X direction first
         let newX = currentX - moveX;
         if (!this.world.checkCollisionX(newX, currentZ, feetY)) {
             this.eye.elements[0] = newX;
         }
         
-        //Then try moving in Z direction
         let newZ = this.eye.elements[2] - moveZ;
         if (!this.world.checkCollisionZ(this.eye.elements[0], newZ, feetY)) {
             this.eye.elements[2] = newZ;
@@ -113,13 +102,11 @@ class Camera {
         let currentX = this.eye.elements[0];
         let currentZ = this.eye.elements[2];
         
-        //Try moving in X direction first
         let newX = currentX + moveX;
         if (!this.world.checkCollisionX(newX, currentZ, feetY)) {
             this.eye.elements[0] = newX;
         }
         
-        //Then try moving in Z direction
         let newZ = this.eye.elements[2] + moveZ;
         if (!this.world.checkCollisionZ(this.eye.elements[0], newZ, feetY)) {
             this.eye.elements[2] = newZ;
@@ -137,13 +124,11 @@ class Camera {
         let currentX = this.eye.elements[0];
         let currentZ = this.eye.elements[2];
         
-        //Try moving in X direction first
         let newX = currentX + moveX;
         if (!this.world.checkCollisionX(newX, currentZ, feetY)) {
             this.eye.elements[0] = newX;
         }
         
-        //Then try moving in Z direction
         let newZ = this.eye.elements[2] + moveZ;
         if (!this.world.checkCollisionZ(this.eye.elements[0], newZ, feetY)) {
             this.eye.elements[2] = newZ;
@@ -160,14 +145,14 @@ class Camera {
     }
 
     updatePhysics() {
-        //Apply gravity
+
         this.velocityY -= this.gravity;
         
-        //Update vertical position
+
         let newY = this.eye.elements[1] + this.velocityY;
         let feetY = newY - this.playerHeight;
         
-        //Check if we're standing on any block
+
         let blockBelow = this.world.getBlockHeightAt(
             this.eye.elements[0], 
             this.eye.elements[2], 
@@ -199,28 +184,28 @@ class Camera {
         this.updateView();
     }
 
-    //Mouse look - handles both horizontal and vertical
+
     mouseMove(dx, dy) {
-        //Update yaw (horizontal rotation)
+
         if (isNaN(this.yaw)) {
             this.yaw = 0;
         }
         this.yaw -= dx * this.mouseSensitivity * Math.PI / 180;
         
-        //Update pitch (vertical rotation)
+
         if (isNaN(this.pitch)) {
             this.pitch = 0;
         }
-        //Subtract dy for natural mouse movement (moving mouse up looks up)
+
         this.pitch -= dy * this.mouseSensitivity * Math.PI / 180;
         
-        //Clamp pitch to prevent over-rotation
+
         this.pitch = Math.max(this.minPitch, Math.min(this.maxPitch, this.pitch));
         
         this.updateView();
     }
 
-    //Keep Q/E for horizontal panning
+
     panLeft(){
         this.yaw += 2 * Math.PI / 180; //2 degrees
         this.updateView();
@@ -231,7 +216,7 @@ class Camera {
         this.updateView();
     }
 
-    //Add new methods for looking up/down manually
+
     lookUp() {
         this.pitch += 2 * Math.PI / 180;
         this.pitch = Math.min(this.maxPitch, this.pitch);
@@ -245,21 +230,17 @@ class Camera {
     }
 
     updateView(){
-        //Make sure we have a valid distance
         if (this.distance <= 0) {
             this.distance = 1;
         }
         
-        //Make sure angles are valid
         if (isNaN(this.yaw)) this.yaw = 0;
         if (isNaN(this.pitch)) this.pitch = 0;
         
-        //Calculate direction vector using yaw and pitch
         let dirX = Math.sin(this.yaw) * Math.cos(this.pitch);
         let dirY = Math.sin(this.pitch);
         let dirZ = Math.cos(this.yaw) * Math.cos(this.pitch);
         
-        //Normalize the direction vector
         let length = Math.sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
         if (length > 0) {
             dirX /= length;
@@ -267,7 +248,6 @@ class Camera {
             dirZ /= length;
         }
         
-        //Set center point based on direction
         this.center.elements[0] = this.eye.elements[0] + dirX * this.distance;
         this.center.elements[1] = this.eye.elements[1] + dirY * this.distance;
         this.center.elements[2] = this.eye.elements[2] + dirZ * this.distance;
