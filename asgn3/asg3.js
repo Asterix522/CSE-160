@@ -1,4 +1,4 @@
-// Shaders
+//Shaders
 var VERTEX_SHADER = `
     precision mediump float;
 
@@ -26,17 +26,17 @@ var FRAGMENT_SHADER = `
     varying vec3 v_Color;
     varying vec2 v_UV;
 
-    uniform sampler2D u_Sampler;      // For cube texture (grass_block.png)
-    uniform sampler2D u_GroundSampler; // For ground texture (block.jpg)
-    uniform int u_UseGroundTexture;    // 1 for ground, 0 for cube
+    uniform sampler2D u_Sampler;      //For cube texture (grass_block.png)
+    uniform sampler2D u_GroundSampler; //For ground texture (block.jpg)
+    uniform int u_UseGroundTexture;    //1 for ground, 0 for cube
 
     void main() {
         if (u_UseGroundTexture == 1) {
-            // Use ground texture
+            //Use ground texture
             vec4 texColor = texture2D(u_GroundSampler, v_UV);
             gl_FragColor = texColor;
         } else {
-            // Use cube texture (with fallback to color if UV is zero)
+            //Use cube texture (with fallback to color if UV is zero)
             if (v_UV.x > 0.0 || v_UV.y > 0.0) {
                 vec4 texColor = texture2D(u_Sampler, v_UV);
                 gl_FragColor = texColor;
@@ -47,7 +47,7 @@ var FRAGMENT_SHADER = `
     }
 `;
 
-// Global variables
+//global variables
 let shapes = [];
 let camera = null;
 let world = null;
@@ -60,42 +60,39 @@ let lastTimestamp = 0;
 let keys = {};
 let mouseLocked = false;
 
-// Audio variables
+//audio variables
 let squeakSound;
 let audioEnabled = false;
 let lastSqueakTime = 0;
 let squeakCooldown = 500;
 
-// Performance optimization variables
+//performance optimization variables
 let frameCount = 0;
 let lastFpsLog = 0;
-let camPos = [0, 0, 0]; // Cache camera position
-let visibleRats = []; // Cache which rats are visible
-
-// Add this to your main game code
+let camPos = [0, 0, 0]; 
 let ratEncounterCount = 0;
 
 function showRatMessage() {
     const messageArea = document.getElementById('message-area');
     const scoreDisplay = document.getElementById('score');
     
-    // Increment counter
+    //Increment counter
     ratEncounterCount++;
     
-    // Show message
+    //Show message
     messageArea.textContent = '"EUGH"';
     
-    // Update score
+    //Update score
     scoreDisplay.textContent = `R to respawn! kill count: ${ratEncounterCount}`;
     
-    // Clear message after animation
+    //Clear message after animation
     setTimeout(() => {
         messageArea.textContent = '';
     }, 2000);
 }
 
 function loadTextures() {
-    // Load cube texture (grass_block.png)
+    //Load cube texture (grass_block.png)
     cubeTexture = gl.createTexture();
     let cubeImg = new Image();
     cubeImg.src = "textures/grass_block.png";
@@ -113,11 +110,11 @@ function loadTextures() {
         let u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
         gl.uniform1i(u_Sampler, 0);
         
-        // Check if both textures are loaded
+        //Check if both textures are loaded
         checkAllTexturesLoaded();
     };
     
-    // Load ground texture (block.jpg)
+    //Load ground texture (block.jpg)
     groundTexture = gl.createTexture();
     let groundImg = new Image();
     groundImg.src = "textures/block.jpg";
@@ -128,18 +125,18 @@ function loadTextures() {
         
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); // Allow repeating for ground
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); //Allow repeating for ground
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, groundImg);
 
         let u_GroundSampler = gl.getUniformLocation(gl.program, "u_GroundSampler");
         gl.uniform1i(u_GroundSampler, 1);
         
-        // Check if both textures are loaded
+        //Check if both textures are loaded
         checkAllTexturesLoaded();
     };
     
-    // Handle errors
+    //Handle errors
     cubeImg.onerror = () => console.error("Failed to load grass_block.png");
     groundImg.onerror = () => console.error("Failed to load block.jpg");
 }
@@ -148,13 +145,12 @@ let texturesLoaded = 0;
 function checkAllTexturesLoaded() {
     texturesLoaded++;
     if (texturesLoaded >= 2) {
-        console.log("✅ Both textures loaded successfully");
         requestAnimationFrame(animate);
     }
 }
 
 
-// Enable audio
+//Enable audio
 document.addEventListener('click', function enableOnFirstClick() {
     if (!audioEnabled) {
         squeakSound = new Audio('assets/eugh.wav');
@@ -175,16 +171,16 @@ function playSqueak() {
     lastSqueakTime = now;
 }
 
-// Optimized rat creation - FEWER RATS for better performance
+
 function createRats() {
     rats = [];
     ratDestroyed = [];
     
-    // Reduced to 3 rats instead of 5 for better performance
+    //Reduced to 3 rats instead of 5 for better performance
     let ratPositions = [
-        [3, -0.5, 0],
-        [4, -0.5, -6],
-        [-4, -0.5, -4]
+        [3, -.8, 0],
+        [4, -.8, -6],
+        [-4, -.8, -4]
     ];
     
     ratPositions.forEach((pos, index) => {
@@ -196,8 +192,6 @@ function createRats() {
         rats.push(rat);
         ratDestroyed.push(false);
     });
-    
-    console.log(`✅ Created ${rats.length} rats`);
 }
 
 function destroyRat(ratIndex) {
@@ -206,13 +200,13 @@ function destroyRat(ratIndex) {
     let rat = rats[ratIndex];
     let ratPos = rat.getPosition();
     
-    // Create blood effect
+    //Create blood effect
     let blood = new ColoredCube([1, 0, 0]);
     blood.scale(0.5, 0.02, 0.5);
-    blood.translate(ratPos[0], ratPos[1] - 1.8, ratPos[2]);
+    blood.translate(ratPos[0], ratPos[1] - 1.7, ratPos[2]);
     shapes.push(blood);
     
-    // Remove all rat parts efficiently (combined into one loop)
+    //Remove all rat parts efficiently (combined into one loop)
     let allParts = [
         ...(rat.bodyParts || []),
         ...(rat.headParts || []),
@@ -229,7 +223,7 @@ function destroyRat(ratIndex) {
     
     ratDestroyed[ratIndex] = true;
     showRatMessage();
-    console.log(`💥 Rat ${ratIndex + 1} destroyed! (${rats.filter(r => !ratDestroyed[rats.indexOf(r)]).length} remaining)`);
+    console.log(`Rabbit ${ratIndex + 1} destroyed! (${rats.filter(r => !ratDestroyed[rats.indexOf(r)]).length} remaining)`);
 }
 
 function respawnAllRats() {
@@ -239,40 +233,14 @@ function respawnAllRats() {
         }
     }
     ratDestroyed = new Array(rats.length).fill(false);
-    console.log(`✨ All ${rats.length} rats respawned`);
 }
 
-function loadWorld() {
-    texture = gl.createTexture();
-    let img = new Image();
-    img.src = "textures/grass_block.png";
-    //img.src = "textures/block.jpg"; // Ensure the image is loaded from the correct path
-
-    img.onload = function() {
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
-
-        let u_Sampler = gl.getUniformLocation(gl.program, "u_Sampler");
-        gl.uniform1i(u_Sampler, 0);
-
-        requestAnimationFrame(animate);
-    };
-    
-    img.onerror = () => requestAnimationFrame(animate);
-
-}
 
 function animate(timestamp) {
-    // FPS counter (optional - comment out for production)
+    //FPS counter (optional - comment out for production)
     frameCount++;
     if (timestamp - lastFpsLog > 1000) {
-        // console.log(`FPS: ${frameCount}`);
+        //console.log(`FPS: ${frameCount}`);
         frameCount = 0;
         lastFpsLog = timestamp;
     }
@@ -289,7 +257,7 @@ function animate(timestamp) {
     
     updateMovement();
 
-    // Update camera position cache
+    //Update camera position cache
     if (camera) {
         let pos = camera.getPositionArray();
         camPos[0] = pos[0];
@@ -297,7 +265,6 @@ function animate(timestamp) {
         camPos[2] = pos[2];
     }
     
-    // OPTIMIZATION: Only update and check collision for nearby rats
     if (camera && rats.length > 0) {
         visibleRats = [];
         
@@ -309,18 +276,17 @@ function animate(timestamp) {
             let dz = camPos[2] - ratPos[2];
             let distSq = dx*dx + dz*dz;
             
-            // Only process rats within 25 units
+            //Only process rabbits within 25 units
             if (distSq < 625) {
                 visibleRats.push(i);
                 
-                // OPTIMIZATION: Update animation every other frame for distant rats
                 if (distSq < 300 || frameCount % 2 === 0) {
                     rats[i].updateAnimation(seconds);
                     rats[i].applyAnimations();
                 }
                 
-                // Collision detection
-                if (distSq < 0.64) { // 0.8^2 = 0.64
+                //Collision detection
+                if (distSq < 0.64) { //0.8^2 = 0.64
                     let dy = Math.abs(camPos[1] - ratPos[1]);
                     if (dy < 1.5) {
                         playSqueak();
@@ -341,7 +307,7 @@ function animate(timestamp) {
         gl.uniformMatrix4fv(u_projectionMatrix, false, camera.projectionMatrix.elements);
     }
 
-    // Draw all shapes
+    //Draw all shapes
     for(let s of shapes){
         draw(s);
     }
@@ -349,9 +315,9 @@ function animate(timestamp) {
     requestAnimationFrame(animate);
 }
 
-// OPTIMIZATION: Distance culling in draw function
+
 function draw(geometry) {
-    // Skip drawing if object is too far away
+    //Skip drawing if object is too far away
     if (geometry.worldMatrix) {
         let pos = [
             geometry.worldMatrix.elements[12],
@@ -363,7 +329,7 @@ function draw(geometry) {
         let dz = pos[2] - camPos[2];
         let distSq = dx*dx + dz*dz;
         
-        // Don't render objects beyond 30 units
+        //Don't render objects beyond 30 units
         if (distSq > 900) return;
     }
 
@@ -379,12 +345,12 @@ function draw(geometry) {
     let u_ModelMatrix = gl.getUniformLocation(gl.program, "u_ModelMatrix");
     gl.uniformMatrix4fv(u_ModelMatrix, false, finalMatrix.elements);
 
-    // Set ground texture flag based on geometry type
+    //Set ground texture flag based on geometry type
     let u_UseGroundTexture = gl.getUniformLocation(gl.program, "u_UseGroundTexture");
     if (geometry instanceof square) {
-        gl.uniform1i(u_UseGroundTexture, 1); // Use ground texture for square
+        gl.uniform1i(u_UseGroundTexture, 1); //Use ground texture for square
     } else {
-        gl.uniform1i(u_UseGroundTexture, 0); // Use cube texture for everything else
+        gl.uniform1i(u_UseGroundTexture, 0); //Use cube texture for everything else
     }
 
     gl.bufferData(gl.ARRAY_BUFFER, geometry.vertices, gl.STATIC_DRAW);
@@ -402,7 +368,8 @@ function updateMovement() {
 
 function onMouseMove(ev) {
     if (!mouseLocked || !camera) return;
-    camera.mouseMove(ev.movementX || 0);
+    //Pass both movementX and movementY
+    camera.mouseMove(ev.movementX || 0, ev.movementY || 0);
 }
 
 function requestPointerLock() {
@@ -414,15 +381,25 @@ function onPointerLockChange() {
 }
 
 function handleKeyDown(ev) {
-    if (ev.keyCode === 32) { // Space
+    if (ev.keyCode === 32) { //Space
         camera.jump();
         ev.preventDefault();
     }
-    if (ev.keyCode === 82) { // R
+    if (ev.keyCode === 82) { //R
         respawnAllRats();
         ev.preventDefault();
     }
-    if ([87, 83, 65, 68, 81, 69, 32, 82].includes(ev.keyCode)) {
+    //Add up/down look keys 
+    if (ev.keyCode === 73) { //I key - look up
+        camera.lookUp();
+        ev.preventDefault();
+    }
+    if (ev.keyCode === 75) { //K key - look down
+        camera.lookDown();
+        ev.preventDefault();
+    }
+    //Include new keys in the preventDefault list
+    if ([87, 83, 65, 68, 81, 69, 73, 75, 32, 82].includes(ev.keyCode)) {
         ev.preventDefault();
     }
 }
@@ -447,6 +424,7 @@ function main() {
 
     gl.enable(gl.DEPTH_TEST);
     gl.clearColor(0.5, 0.7, 1.0, 1.0);
+    //gl.clearColor(146/255, 108/255, 77/255, 1.0); //Black background for better contrast with textures
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     if(!initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER)) {
@@ -471,49 +449,192 @@ function main() {
     gl.vertexAttribPointer(a_UV, 2, gl.FLOAT, false, 8*FLOAT_SIZE, 6*FLOAT_SIZE);
     gl.enableVertexAttribArray(a_UV);
 
-    // OPTIMIZATION: Smaller ground for better performance
     let ground = new square();
     ground.translate(0, -0.5, 0);
     ground.scale(12, 12, 12);
     ground.rotateX(90);
     shapes.push(ground);
 
-    // Create rats
+    //create sky
+    /*
+    let sky = new ColoredCube([135, 206, 235].map(c => c/255));
+    sky.scale(12, 0.02, 12);
+    sky.translate(0, 3.5, 0);
+    shapes.push(sky);
+    */
+
+    //Create rats
     createRats();
 
-    // Create world
+    //Create world
     world = new World();
     let roomSize = 8;
     
-    for (let x = -roomSize; x <= roomSize; x+=2) {
-        world.addWall(x, roomSize, 3);
-        world.addWall(x, -roomSize, 3);
+    for (let x = -roomSize; x <= roomSize; x+=1) {
+        world.addWall(x, roomSize, Math.random() * 4);
+        world.addWall(x, -roomSize, Math.random() * 4);
     }
     
-    for (let z = -roomSize; z <= roomSize; z+=2) {
-        world.addWall(-roomSize, z, 3);
-        world.addWall(roomSize, z, 3);
+    for (let z = -roomSize; z <= roomSize; z+=1) {
+        world.addWall(-roomSize, z, Math.random() * 4);
+        world.addWall(roomSize, z, Math.random() * 4);
     }
     
     world.addWall(0, 0, 2);
     world.addWall(2, 2, 1);
     world.addWall(-2, -2, 2);
     
-    console.log(`Created world with ${world.walls.length} walls`);
+    //console.log(`Created world with ${world.walls.length} walls`);
 
-    // Create camera
+    //Create camera
     camera = new Camera(canvas.width/canvas.height, 0.1, 1000, world);
 
-    // Set up event listeners
+    //Set up event listeners
     document.onkeydown = keydown;
     document.onkeyup = keyup;
     
     canvas.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("click", requestPointerLock);
+    
+    
+canvas.addEventListener("mousedown", function(ev) {
+    ev.preventDefault(); //Prevent default actions
+    
+    if (!camera) return;
+        
+    //Check which button was clicked
+    //ev.button === 0 = left click
+    //ev.button === 2 = right click
+    if (ev.button === 0) { //Left click - place block in front (stack if block exists)
+        let target = getGridSpaceInFront();
+        
+        if (target) {
+            //Check if there's already a block at this X,Z position
+            let highestY = getHighestBlockYAt(target.x, target.z);
+            
+            if (highestY !== null) {
+                //There's a block here - stack on top
+                target.y = highestY + 1; //Place one level higher  
+            } 
+            //Check if the specific space is occupied (shouldn't be if we calculated correctly)
+            if (!world.isSpaceOccupied(target.x, target.y, target.z)) {
+                world.addWall(target.x, target.z, 1, target.y);
+                //console.log(`Block placed at (${target.x}, ${target.y}, ${target.z})`);
+            } 
+        }
+        
+    } else if (ev.button === 2) { //Right click - delete ENTIRE COLUMN at X,Z position
+        let target = getGridSpaceInFront();
+        
+        if (target) {
+            //console.log(`Right click - deleting ENTIRE COLUMN at grid (${target.x}, ?, ${target.z})`);
+            
+            let blocksDeleted = 0;
+            
+            //Loop backwards through walls array so we can remove multiple blocks safely
+            for (let i = world.walls.length - 1; i >= 0; i--) {
+                let wall = world.walls[i];
+                let wallX = Math.round(wall.translationMatrix.elements[12]);
+                let wallY = Math.round(wall.translationMatrix.elements[13]);
+                let wallZ = Math.round(wall.translationMatrix.elements[14]);
+                
+                //Check if this block is at the target X,Z position (any Y)
+                if (wallX === target.x && wallZ === target.z) {
+                    
+                    //Remove from shapes array
+                    let shapeIndex = shapes.indexOf(wall);
+                    if (shapeIndex > -1) {
+                        shapes.splice(shapeIndex, 1);
+                    }
+                    
+                    //Remove from world walls array
+                    world.walls.splice(i, 1);
+                    blocksDeleted++;
+                    
+                    //console.log(`   Deleted block at Y=${wallY}`);
+                }
+            }
+            
+            if (blocksDeleted > 0) {
+                //console.log(`✅ Deleted entire column of ${blocksDeleted} block(s) at X=${target.x}, Z=${target.z}`);
+            } else {
+                console.log("No blocks found at that X,Z position");
+            }
+        }
+    }
+});
+
+//Also prevent context menu from appearing on right-click
+canvas.addEventListener("contextmenu", function(ev) {
+    ev.preventDefault();
+});
+    
     document.addEventListener("pointerlockchange", onPointerLockChange);
     document.addEventListener("mozpointerlockchange", onPointerLockChange);
     document.addEventListener("webkitpointerlockchange", onPointerLockChange);
 
-    // Load both textures
+    //Load both textures
     loadTextures();
+}
+
+function getGridSpaceInFront() {
+    if (!camera) return null;
+    
+    let pos = camera.getPositionArray();
+    
+    //Get camera direction (yaw only, ignore pitch for horizontal placement)
+    let dirX = Math.sin(camera.yaw);
+    let dirZ = Math.cos(camera.yaw);
+    
+    //Determine which direction has the strongest component
+    let targetX = Math.round(pos[0]);
+    let targetZ = Math.round(pos[2]);
+    
+    //Check which axis we're primarily facing
+    if (Math.abs(dirX) > Math.abs(dirZ)) {
+        //Facing mostly in X direction
+        if (dirX > 0) {
+            targetX = Math.floor(pos[0]) + 1; //Facing positive X
+        } else {
+            targetX = Math.ceil(pos[0]) - 1; //Facing negative X
+        }
+        targetZ = Math.round(pos[2]); //Keep Z aligned to grid
+    } else {
+        //Facing mostly in Z direction
+        if (dirZ > 0) {
+            targetZ = Math.floor(pos[2]) + 1; //Facing positive Z
+        } else {
+            targetZ = Math.ceil(pos[2]) - 1; //Facing negative Z
+        }
+        targetX = Math.round(pos[0]); //Keep X aligned to grid
+    }
+    
+    //Y is at the player's feet level (rounded to nearest block height)
+    let feetY = pos[1] - camera.playerHeight;
+    let targetY = Math.round(feetY);
+    
+    return {
+        x: targetX,
+        y: targetY,
+        z: targetZ
+    };
+}
+
+//Helper function to find the highest Y at a given X,Z position
+function getHighestBlockYAt(x, z) {
+    let highestY = -Infinity;
+    
+    for (let wall of world.walls) {
+        let wallX = Math.round(wall.translationMatrix.elements[12]);
+        let wallY = Math.round(wall.translationMatrix.elements[13]);
+        let wallZ = Math.round(wall.translationMatrix.elements[14]);
+        
+        if (wallX === x && wallZ === z) {
+            if (wallY > highestY) {
+                highestY = wallY;
+            }
+        }
+    }
+    
+    return highestY === -Infinity ? null : highestY;
 }

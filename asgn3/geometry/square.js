@@ -2,8 +2,7 @@ class square extends geometry {
     constructor(tileCount = 20) {
         super();
         
-        // Include color this time for debugging
-        const floatsPerVertex = 8; // x,y,z,r,g,b,u,v
+        const floatsPerVertex = 8; //x,y,z,r,g,b,u,v
         const verticesPerTile = 6;
         const totalTiles = tileCount * tileCount;
         const totalVertices = totalTiles * verticesPerTile;
@@ -21,13 +20,13 @@ class square extends geometry {
                 const bottom = startY + row * tileSize;
                 const top = bottom + tileSize;
                 
-                // Alternate colors based on grid position for debugging
+                //Alternate colors based on grid position for debugging
                 const r = (row + col) % 2 === 0 ? 1.0 : 0.5;
                 const g = (row) / tileCount;
                 const b = (col) / tileCount;
                 
-                // First triangle
-                // bottom-left
+                //First triangle
+                //bottom-left
                 vertices[offset++] = left;
                 vertices[offset++] = bottom;
                 vertices[offset++] = 0.0;
@@ -37,7 +36,7 @@ class square extends geometry {
                 vertices[offset++] = 0.0;
                 vertices[offset++] = 0.0;
                 
-                // bottom-right
+                //bottom-right
                 vertices[offset++] = right;
                 vertices[offset++] = bottom;
                 vertices[offset++] = 0.0;
@@ -47,7 +46,7 @@ class square extends geometry {
                 vertices[offset++] = 1.0;
                 vertices[offset++] = 0.0;
                 
-                // top-right
+                //top-right
                 vertices[offset++] = right;
                 vertices[offset++] = top;
                 vertices[offset++] = 0.0;
@@ -57,8 +56,8 @@ class square extends geometry {
                 vertices[offset++] = 1.0;
                 vertices[offset++] = 1.0;
                 
-                // Second triangle
-                // bottom-left
+                //Second triangle
+                //bottom-left
                 vertices[offset++] = left;
                 vertices[offset++] = bottom;
                 vertices[offset++] = 0.0;
@@ -68,7 +67,7 @@ class square extends geometry {
                 vertices[offset++] = 0.0;
                 vertices[offset++] = 0.0;
                 
-                // top-right
+                //top-right
                 vertices[offset++] = right;
                 vertices[offset++] = top;
                 vertices[offset++] = 0.0;
@@ -78,7 +77,7 @@ class square extends geometry {
                 vertices[offset++] = 1.0;
                 vertices[offset++] = 1.0;
                 
-                // top-left
+                //top-left
                 vertices[offset++] = left;
                 vertices[offset++] = top;
                 vertices[offset++] = 0.0;
@@ -91,6 +90,5 @@ class square extends geometry {
         }
         
         this.vertices = vertices;
-        console.log(`Created ${totalTiles} tiles`);
     }
 }
