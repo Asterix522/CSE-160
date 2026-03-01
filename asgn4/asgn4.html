@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>ASG 4</title>
+        <title>Assignment 4</title>
 
         <!-- Load external libs -->
         <script src="lib/cuon-matrix-cse160.js"></script>
@@ -28,24 +28,24 @@
         <canvas id="canvas" width="600" height="600"></canvas>
         <div style="margin-top: 5px; text-align: left; font-family: monospace; font-size: 12px;">
 
-    <div>POSITION</div>
-    X <input type="range" id="lightX" min="-3" max="3" step="0.1" value="0.0">
-    Y <input type="range" id="lightY" min="-3" max="3" step="0.1" value="1.5">
-    Z <input type="range" id="lightZ" min="-3" max="3" step="0.1" value="1.0">
+        <div>POSITION</div>
+        X <input type="range" id="lightX" min="-3" max="3" step="0.1" value="0.0">
+        Y <input type="range" id="lightY" min="-3" max="3" step="0.1" value="1.5">
+        Z <input type="range" id="lightZ" min="-3" max="3" step="0.1" value="1.0">
     
 
-    <div style="margin-top: 8px;">LIGHT 1 COLOR</div>
-    R <input type="range" id="light1R" min="0" max="1" step="0.01" value="1.0">
-    G <input type="range" id="light1G" min="0" max="1" step="0.01" value="1.0">
-    B <input type="range" id="light1B" min="0" max="1" step="0.01" value="1.0">
+        <div style="margin-top: 8px;">LIGHT COLOR</div>
+        R <input type="range" id="light1R" min="0" max="1" step="0.01" value="1.0">
+        G <input type="range" id="light1G" min="0" max="1" step="0.01" value="1.0">
+        B <input type="range" id="light1B" min="0" max="1" step="0.01" value="1.0">
 
-    <br> use mouse to move camera and WASD to move <br>
+        <br> use mouse to move camera and WASD/space to move and jump <br>
 
-    <div style="margin-top: 10px;">
+        <div style="margin-top: 10px;">
         <button id="lightsToggle" style="font-family: monospace; font-size: 12px; padding: 2px 10px;">LIGHTS: ON</button>
-    </div>
-</div>
-
+        </div>
+        <button id="normalsToggle" style="font-family: monospace; font-size: 12px; padding: 2px 10px;">NORMALS: OFF</button>
+        </div>
 </div>
     </body>
 </html>

@@ -1,27 +1,18 @@
-//rat.js - Rat model with reduced foot movement
+//despite the name, this is a rabbit lol
 class Rat {
     constructor() {
-        //Arrays to store all rat part cubes
         this.bodyParts = [];
         this.headParts = [];
         this.faceParts = [];
         this.earParts = [];
         this.legParts = [];
         this.tailParts = [];
-        
-        //Local position offset (will be combined with world matrix)
-        this.localPosition = [0, 2, 0]; //x, y, z position
-        
-        //World transformation matrix for the entire rat
+        this.localPosition = [0, 2, 0];
         this.worldMatrix = new Matrix4();
         this.worldMatrix.setIdentity();
-        
-        //Store the base transformations separately
         this.baseTranslate = [0, 0, 0];
         this.baseRotate = [0, 0, 0];
         this.baseScale = [1, 1, 1];
-        
-        //Animation variables
         this.rightHaunch = 0;
         this.leftHaunch = 0;
         this.backFeet = 0;
@@ -35,13 +26,9 @@ class Rat {
         this.earJ = 0;
         this.noseJ = 0;
         this.blink = 0;
-        
-        //Colors
         this.bodyColor = [255/255, 253/255, 208/255];
         this.pinkColor = [255/255, 255/255, 255/255];
         this.blackColor = [0, 0, 0];
-        
-        //Create all rat parts
         this.createRat();
     }
 
@@ -167,7 +154,6 @@ class Rat {
     }
     
     applyAnimations() {
-        //Get the base position and scale
         let baseX = this.baseTranslate[0] + this.localPosition[0];
         let baseY = this.baseTranslate[1] + this.localPosition[1];
         let baseZ = this.baseTranslate[2] + this.localPosition[2];
