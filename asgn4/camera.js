@@ -1,14 +1,13 @@
-// camera.js - Smooth Camera with Physics (Lower Height)
 class Camera {
     constructor(aspectRatio, near, far, world){
         this.fov = 60;
         this.near = near || 0.1;
         this.far = far || 1000;
-        this.eye = new Vector3([0, 0.5, 6]); // CHANGED: Lower start position from y=2 to y=0.5
+        this.eye = new Vector3([0, 0.5, 6]);
         
         let initialDirX = 0;
         let initialDirY = 0;
-        let initialDirZ = -1; //looking along negative Z axis
+        let initialDirZ = -1; 
         
         this.center = new Vector3([
             this.eye.elements[0] + initialDirX,
@@ -36,9 +35,9 @@ class Camera {
         this.gravity = 0.015;
         this.isGrounded = false;
         this.jumpStrength = 0.3;
-        this.groundLevel = 0.0; // CHANGED: Ground level from 2.0 to 0.0
-        this.playerHeight = 0.5; // CHANGED: Player height from 1.8 to 0.5
-        this.world = world; // Keep world reference but don't use it for collision
+        this.groundLevel = 0.0; 
+        this.playerHeight = 0.5;
+        this.world = world;
         
         this.updateView();
         
@@ -58,7 +57,6 @@ class Camera {
         let moveX = Math.sin(this.yaw) * this.moveSpeed;
         let moveZ = Math.cos(this.yaw) * this.moveSpeed;
         
-        // REMOVED all collision checks - just move freely
         this.eye.elements[0] += moveX;
         this.eye.elements[2] += moveZ;
         
@@ -68,8 +66,7 @@ class Camera {
     moveBackwards(){
         let moveX = Math.sin(this.yaw) * this.moveSpeed;
         let moveZ = Math.cos(this.yaw) * this.moveSpeed;
-        
-        // REMOVED all collision checks - just move freely
+       
         this.eye.elements[0] -= moveX;
         this.eye.elements[2] -= moveZ;
         
@@ -80,8 +77,7 @@ class Camera {
         let strafeAngle = this.yaw + Math.PI/2;
         let moveX = Math.sin(strafeAngle) * this.moveSpeed;
         let moveZ = Math.cos(strafeAngle) * this.moveSpeed;
-        
-        // REMOVED all collision checks - just move freely
+    
         this.eye.elements[0] += moveX;
         this.eye.elements[2] += moveZ;
         
@@ -93,7 +89,6 @@ class Camera {
         let moveX = Math.sin(strafeAngle) * this.moveSpeed;
         let moveZ = Math.cos(strafeAngle) * this.moveSpeed;
         
-        // REMOVED all collision checks - just move freely
         this.eye.elements[0] += moveX;
         this.eye.elements[2] += moveZ;
         
@@ -101,20 +96,14 @@ class Camera {
     }
 
     jump() {
-        // Simple jump without collision checks
         this.velocityY = this.jumpStrength;
         this.isGrounded = false;
     }
 
     updatePhysics() {
-        // Apply gravity
         this.velocityY -= this.gravity;
-        
-        // Simple ground collision (just keep above ground level)
         let newY = this.eye.elements[1] + this.velocityY;
         let feetY = newY - this.playerHeight;
-        
-        // Simple ground plane at groundLevel
         if (feetY <= this.groundLevel) {
             newY = this.groundLevel + this.playerHeight;
             this.velocityY = 0;

@@ -74,8 +74,6 @@ function parseOBJ(objText) {
         }
     }
     
-    console.log(`Parsed ${vertices.length/3} vertices, ${normals.length/3} normals`);
-    console.log(`Generated ${faceVertices.length} face vertices`);
     
     const hasNormals = faceNormals.length > 0 && normals.length > 0;
     const uniqueVertices = [];
@@ -123,11 +121,9 @@ function parseOBJ(objText) {
         uniqueIndices.push(vertexMap.get(key));
     }
     
-    console.log(`Generated ${uniqueVertices.length/3} unique vertices, ${uniqueIndices.length} indices`);
     
     let finalNormals = uniqueNormals;
     if (!hasNormals || uniqueNormals.length === 0) {
-        console.log('Generating normals...');
         finalNormals = generateNormals(uniqueVertices, uniqueIndices);
     }
     
@@ -201,7 +197,6 @@ function generateNormals(vertices, indices) {
 }
 
 function loadOBJ(url, color, callback) {
-    console.log('Loading OBJ from:', url);
     
     fetch(url)
         .then(response => {
@@ -211,13 +206,7 @@ function loadOBJ(url, color, callback) {
             return response.text();
         })
         .then(objText => {
-            console.log('OBJ loaded, parsing...');
             const objData = parseOBJ(objText);
-            
-            console.log('Final vertices:', objData.vertices.length / 3);
-            console.log('Final indices:', objData.indices.length);
-            console.log('Final normals:', objData.normals.length / 3);
-            
             const model = new OBJModel(color, objData);
             callback(model);
         })
