@@ -27,6 +27,9 @@ controls.target.set(0, 2, 0);
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
+loadMonkey();
+loadTeaTable();
+
 const skyboxLoader = new THREE.CubeTextureLoader();
 const skyboxTexture = skyboxLoader.load([
     'skybox/skybox_px.jpg',
@@ -619,8 +622,6 @@ function loadMonkey() {
     );
 }
 
-loadMonkey();
-loadTeaTable();
 
 let clock = new THREE.Clock();
 
