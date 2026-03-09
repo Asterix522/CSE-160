@@ -24,6 +24,9 @@ controls.minDistance = 3;
 controls.maxDistance = 50;
 controls.target.set(0, 2, 0);
 
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
 const skyboxLoader = new THREE.CubeTextureLoader();
 const skyboxTexture = skyboxLoader.load([
     'skybox/skybox_px.jpg',
@@ -73,9 +76,25 @@ ground.position.y = -0.01;
 ground.receiveShadow = true;
 scene.add(ground);
 
-const gridHelper = new THREE.GridHelper(40, 20, 0xffffff, 0x888888);
-gridHelper.position.y = 0;
-scene.add(gridHelper);
+
+const textureLoader = new THREE.TextureLoader();
+
+function loadTexture(path) {
+    try {
+        const texture = textureLoader.load(path);
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(1, 1);
+        return texture;
+    } catch (error) {
+        console.warn(`Could not load texture ${path}`);
+        return null;
+    }
+}
+
+const cubeTextures = [
+    { map: loadTexture('textures/test.jpg')}
+];
 
 function randomColor() {
     const hue = Math.random();
@@ -89,12 +108,21 @@ function createShape(type, pos, color = null, scale = 1, castShadow = true) {
     let geometry, material, mesh;
     
     const finalColor = color || randomColor();
-    material = new THREE.MeshStandardMaterial({ 
-        color: finalColor,
-        roughness: 0.4,
-        metalness: 0.1,
-        emissive: type === 'sphere' && Math.random() > 0.7 ? new THREE.Color(0x333333) : new THREE.Color(0x000000)
-    });
+    const useTexture = type === 'cube' && cubeTextures[0].map; 
+    
+    if (useTexture) {
+        material = new THREE.MeshStandardMaterial({ 
+            map: cubeTextures[0].map,
+            roughness: 0.6,
+            metalness: 0.1
+        });
+    } else {
+        material = new THREE.MeshStandardMaterial({ 
+            color: finalColor,
+            roughness: 0.4,
+            metalness: 0.1
+        });
+    }
     
     switch(type) {
         case 'cube':
@@ -126,8 +154,6 @@ function createShape(type, pos, color = null, scale = 1, castShadow = true) {
         case 'icosahedron':
             geometry = new THREE.IcosahedronGeometry(0.5);
             break;
-        default:
-            geometry = new THREE.BoxGeometry(1, 1, 1);
     }
     
     mesh = new THREE.Mesh(geometry, material);
@@ -185,7 +211,7 @@ for (let i = 0; i < 30; i++) {
 const customModelGroup = new THREE.Group();
 
 const bodyGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.5, 8);
-const bodyMat = new THREE.MeshStandardMaterial({ color: 0x44aa88, emissive: 0x113322 });
+const bodyMat = new THREE.MeshStandardMaterial({ color: 0x44aa88 });
 const body = new THREE.Mesh(bodyGeo, bodyMat);
 body.position.y = 1;
 body.castShadow = true;
@@ -250,7 +276,6 @@ scene.add(customModelGroup);
 
 animatedObjects.push({
     mesh: customModelGroup,
-    speed: 0.005,
     type: 'float',
     originalY: customModelGroup.position.y
 });
@@ -330,7 +355,7 @@ function createTree(x, z) {
 }
 
 const treePositions = [
-    [-7, -14], [15, 0], [-11, 9], [8, 12], [-15, 0], [10, -13]
+    [-7, -12], [15, 0], [-11, 9], [8, 12], [-15, 0], [9, -13]
 ];
 
 treePositions.forEach(pos => {
@@ -341,7 +366,7 @@ treePositions.forEach(pos => {
 //candle
 const candleGroup = new THREE.Group();
 const candleBaseGeo = new THREE.CylinderGeometry(0.1, 0.1, 1.2, 16);
-const candleBaseMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.3, emissive: 0x221100 });
+const candleBaseMat = new THREE.MeshStandardMaterial({ color: 0xffeedd, roughness: 0.3 });
 const candleBase = new THREE.Mesh(candleBaseGeo, candleBaseMat);
 candleBase.position.y = 0.6;
 candleBase.castShadow = true;
@@ -370,9 +395,6 @@ candleGroup.add(flame);
 const candleLight = new THREE.PointLight(0xff6600, 2, 8);
 candleLight.position.set(0, 1.3, 0);
 candleLight.castShadow = true;
-candleLight.shadow.mapSize.width = 512;
-candleLight.shadow.mapSize.height = 512;
-candleLight.shadow.bias = 0.0005;
 candleGroup.add(candleLight);
 
 const glowGeo = new THREE.SphereGeometry(0.15, 8, 8);
@@ -386,19 +408,113 @@ const glow = new THREE.Mesh(glowGeo, glowMat);
 glow.position.y = 1.4;
 candleGroup.add(glow);
 
+//smoke particles
+const smokeGeo = new THREE.BufferGeometry();
+const smokeCount = 30;
+const smokePositions = new Float32Array(smokeCount * 3);
+const smokeColors = new Float32Array(smokeCount * 3);
+
+for (let i = 0; i < smokeCount; i++) {
+    smokePositions[i*3] = 0;
+    smokePositions[i*3+1] = 0;
+    smokePositions[i*3+2] = 0;
+    smokeColors[i*3] = 0.5;
+    smokeColors[i*3+1] = 0.5;
+    smokeColors[i*3+2] = 0.5;
+}
+
+smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePositions, 3));
+smokeGeo.setAttribute('color', new THREE.BufferAttribute(smokeColors, 3));
+
+const smokeMat = new THREE.PointsMaterial({
+    size: 0.1,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.NormalBlending,
+    depthWrite: false
+});
+
+const smoke = new THREE.Points(smokeGeo, smokeMat);
+smoke.visible = false;
+candleGroup.add(smoke);
 
 candleGroup.position.set(-1.9, 5, 0.5);
 candleGroup.rotation.y = 0.5;
 scene.add(candleGroup);
 
+//candle state
+let candleLit = true;
+let blowoutTimer = 0;
 
 animatedObjects.push({
     mesh: candleGroup,
     type: 'candle',
     flame: flame,
     light: candleLight,
-    glow: glow
+    glow: glow,
+    wick: wick,
+    smoke: smoke,
+    isLit: true
 });
+
+renderer.domElement.addEventListener('click', onClick, false);
+
+function onClick(event) {
+    mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+    mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+    
+    raycaster.setFromCamera(mouse, camera);
+    
+    const candleParts = [flame, candleBase, wick];
+    const intersects = raycaster.intersectObjects(candleParts);
+    
+    if (intersects.length > 0 && candleLit) {
+        blowOutCandle();
+    }
+}
+
+function blowOutCandle() {
+    candleLit = false;
+    blowoutTimer = 0;
+    
+    flame.visible = false;
+    glow.visible = false;
+    candleLight.intensity = 0;
+    
+    const candleObj = animatedObjects.find(obj => obj.type === 'candle');
+    if (candleObj) {
+        candleObj.isLit = false;
+        candleObj.smoke.visible = true;
+    }
+    
+    wick.material.color.setHex(0x884422);
+    wick.scale.set(1.2, 0.5, 1.2);
+    
+    setTimeout(() => {
+        wick.scale.set(1, 1, 1);
+    }, 200);
+    
+    window.dispatchEvent(new CustomEvent('candleStateChange', { detail: { isLit: false } }));
+}
+
+function relightCandle() {
+    candleLit = true;
+    
+    flame.visible = true;
+    glow.visible = true;
+    candleLight.intensity = 2;
+    
+    const candleObj = animatedObjects.find(obj => obj.type === 'candle');
+    if (candleObj) {
+        candleObj.isLit = true;
+        candleObj.smoke.visible = false;
+    }
+    
+    wick.material.color.setHex(0x332211);
+    
+    window.dispatchEvent(new CustomEvent('candleStateChange', { detail: { isLit: true } }));
+}
 
 const loader = new GLTFLoader();
 
@@ -408,6 +524,7 @@ loader.load(
         const model = gltf.scene;
         model.position.set(0, 10, 0);
         model.scale.set(50, 50, 50);
+        model.rotation.y = -90 * Math.PI / 180;
         model.traverse((node) => {
             if (node.isMesh) {
                 node.castShadow = true;
@@ -442,19 +559,6 @@ function loadTeaTable() {
                         if (child.isMesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
-                            if (child.material) {
-                                if (Array.isArray(child.material)) {
-                                    child.material.forEach(mat => {
-                                        mat.roughness = mat.roughness || 0.4;
-                                        mat.metalness = mat.metalness || 0.1;
-                                        mat.needsUpdate = true;
-                                    });
-                                } else {
-                                    child.material.roughness = child.material.roughness || 0.4;
-                                    child.material.metalness = child.material.metalness || 0.1;
-                                    child.material.needsUpdate = true;
-                                }
-                            }
                         }
                     });
                     scene.add(object);
@@ -494,19 +598,6 @@ function loadMonkey() {
                         if (child.isMesh) {
                             child.castShadow = true;
                             child.receiveShadow = true;
-                            if (child.material) {
-                                if (Array.isArray(child.material)) {
-                                    child.material.forEach(mat => {
-                                        mat.roughness = mat.roughness || 0.4;
-                                        mat.metalness = mat.metalness || 0.1;
-                                        mat.needsUpdate = true;
-                                    });
-                                } else {
-                                    child.material.roughness = child.material.roughness || 0.4;
-                                    child.material.metalness = child.material.metalness || 0.1;
-                                    child.material.needsUpdate = true;
-                                }
-                            }
                         }
                     });
                     scene.add(object);
@@ -542,40 +633,59 @@ function animate() {
             obj.mesh.position.y = obj.originalY + Math.sin(elapsedTime * 2) * 0.2;
         } 
         else if (obj.type === 'candle') {
-            if (obj.flame) {
-                const flickerX = 1 + Math.sin(elapsedTime * 12) * 0.15 + Math.sin(elapsedTime * 20) * 0.1;
-                const flickerY = 1 + Math.sin(elapsedTime * 10) * 0.2 + Math.sin(elapsedTime * 18) * 0.1;
-                const flickerZ = 1 + Math.sin(elapsedTime * 12) * 0.15 + Math.sin(elapsedTime * 22) * 0.1;
+            if (obj.isLit) {
+                if (obj.flame) {
+                    const flickerX = 1 + Math.sin(elapsedTime * 12) * 0.15 + Math.sin(elapsedTime * 20) * 0.1;
+                    const flickerY = 1 + Math.sin(elapsedTime * 10) * 0.2 + Math.sin(elapsedTime * 18) * 0.1;
+                    const flickerZ = 1 + Math.sin(elapsedTime * 12) * 0.15 + Math.sin(elapsedTime * 22) * 0.1;
+                    
+                    obj.flame.scale.set(flickerX, flickerY, flickerZ);
+                    obj.flame.rotation.x = Math.sin(elapsedTime * 8) * 0.05;
+                    obj.flame.rotation.z = Math.cos(elapsedTime * 9) * 0.05;
+                }
                 
-                obj.flame.scale.set(flickerX, flickerY, flickerZ);
+                if (obj.light) {
+                    const intensity = 2.0 + Math.sin(elapsedTime * 15) * 1.0 + Math.sin(elapsedTime * 25) * 0.5;
+                    obj.light.intensity = intensity;
+                    
+                    const r = 1.0;
+                    const g = 0.5 + Math.sin(elapsedTime * 10) * 0.1;
+                    const b = 0.2 + Math.sin(elapsedTime * 12) * 0.1;
+                    obj.light.color.setRGB(r, g, b);
+                }
                 
-                obj.flame.rotation.x = Math.sin(elapsedTime * 8) * 0.05;
-                obj.flame.rotation.z = Math.cos(elapsedTime * 9) * 0.05;
-            }
-            
-            if (obj.light) {
-                const intensity = 2.0 + Math.sin(elapsedTime * 15) * 1.0 + Math.sin(elapsedTime * 25) * 0.5;
-                obj.light.intensity = intensity;
-                
-                const r = 1.0;
-                const g = 0.5 + Math.sin(elapsedTime * 10) * 0.1;
-                const b = 0.2 + Math.sin(elapsedTime * 12) * 0.1;
-                obj.light.color.setRGB(r, g, b);
-            }
-            
-            if (obj.glow) {
-                obj.glow.scale.setScalar(1 + Math.sin(elapsedTime * 10) * 0.1);
-                obj.glow.material.opacity = 0.2 + Math.sin(elapsedTime * 8) * 0.1;
+                if (obj.glow) {
+                    obj.glow.scale.setScalar(1 + Math.sin(elapsedTime * 10) * 0.1);
+                    obj.glow.material.opacity = 0.2 + Math.sin(elapsedTime * 8) * 0.1;
+                }
+            } else {
+                if (obj.smoke && obj.smoke.visible) {
+                    const positions = obj.smoke.geometry.attributes.position.array;
+                    blowoutTimer += delta;
+                    
+                    for (let i = 0; i < positions.length; i += 3) {
+                        if (positions[i+1] > 2.0) {
+                            positions[i] = (Math.random() - 0.5) * 0.2;
+                            positions[i+1] = 1.4;
+                            positions[i+2] = (Math.random() - 0.5) * 0.2;
+                        } else {
+                            positions[i] += (Math.random() - 0.5) * 0.01;
+                            positions[i+1] += 0.01 + Math.random() * 0.02;
+                            positions[i+2] += (Math.random() - 0.5) * 0.01;
+                        }
+                    }
+                    
+                    obj.smoke.geometry.attributes.position.needsUpdate = true;
+                    obj.smoke.material.opacity = 0.6 * Math.max(0, 1 - blowoutTimer / 10);
+                }
             }
         }
         else {
             obj.mesh.rotateOnWorldAxis(obj.rotAxis, obj.rotSpeed * delta * 30);
-            
             obj.orbitAngle += obj.orbitSpeed * delta;
             
             const orbitX = Math.cos(obj.orbitAngle) * obj.orbitRadius;
             const orbitZ = Math.sin(obj.orbitAngle) * obj.orbitRadius;
-            
             const bobY = Math.sin(elapsedTime * obj.bobSpeed) * obj.bobHeight;
             
             obj.mesh.position.x = orbitX;
@@ -599,7 +709,6 @@ function animate() {
         hemisphereLight.intensity = Math.max(0.1, hemiIntensity);
     }
     
-    //animate particles
     const positions = particles.geometry.attributes.position.array;
     for (let i = 1; i < positions.length; i += 3) {
         positions[i] += 0.01;
@@ -625,3 +734,9 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+window.addEventListener('keydown', (event) => {
+    if (event.key === 'r' || event.key === 'R') {
+        relightCandle();
+    }
+});
